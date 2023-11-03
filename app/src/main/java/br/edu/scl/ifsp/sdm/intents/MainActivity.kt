@@ -1,6 +1,8 @@
 package br.edu.scl.ifsp.sdm.intents
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -73,6 +75,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.viewMi -> {
+                val url = Uri.parse(activityMainBinding.parameterTv.text.toString())
+                val browserIntent = Intent(ACTION_VIEW, url)
+                startActivity(browserIntent)
                 true
             }
 
