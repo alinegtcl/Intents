@@ -1,11 +1,16 @@
 package br.edu.scl.ifsp.sdm.intents
 
+import android.Manifest.permission.CALL_PHONE
 import android.content.Intent
+import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_VIEW
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var parameterArl: ActivityResultLauncher<Intent>
+    private lateinit var callPhonePermissionArl: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(activityMainBinding.root)
@@ -34,6 +40,18 @@ class MainActivity : AppCompatActivity() {
                     result.data?.getStringExtra(PARAMETER_EXTRA)?.also {
                         activityMainBinding.parameterTv.text = it
                     }
+                }
+            }
+
+        callPhonePermissionArl =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+                if (permissionGranted) {
+                    callPhone()
+                } else {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.permission_required_to_call), Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -82,6 +100,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.callMi -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(CALL_PHONE) == PERMISSION_GRANTED) {
+                        callPhone()
+                    } else {
+                        callPhonePermissionArl.launch(CALL_PHONE)
+                    }
+                } else {
+                    callPhone()
+                }
                 true
             }
 
@@ -101,5 +128,13 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+    }
+
+    private fun callPhone() {
+        startActivity(Intent(ACTION_CALL).apply {
+            "tel: ${activityMainBinding.parameterTv.text}".also {
+                data = Uri.parse(it)
+            }
+        })
     }
 }
