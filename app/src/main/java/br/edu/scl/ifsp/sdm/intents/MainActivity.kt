@@ -11,7 +11,7 @@ import br.edu.scl.ifsp.sdm.intents.Extras.PARAMETER_EXTRA
 import br.edu.scl.ifsp.sdm.intents.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-//    Não é mais necessário, devido a retirada da obsolescência
+    //    Não é mais necessário, devido a retirada da obsolescência
 //    companion object{
 //        private const val PARAMETER_REQUEST_CODE = 0
 //    }
@@ -26,19 +26,21 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(activityMainBinding.toolbarIn.toolbar)
         supportActionBar?.subtitle = localClassName
 
-        parameterArl = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
-            if(result.resultCode == RESULT_OK) {
-                result.data?.getStringExtra(PARAMETER_EXTRA)?.also {
-                    activityMainBinding.parameterTv.text = it
+        parameterArl =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.getStringExtra(PARAMETER_EXTRA)?.also {
+                        activityMainBinding.parameterTv.text = it
+                    }
                 }
             }
-        }
 
         activityMainBinding.apply {
             parameterBt.setOnClickListener {
-                val parameterIntent = Intent(this@MainActivity, ParameterActivity::class.java).apply {
-                    putExtra(PARAMETER_EXTRA, parameterTv.text)
-                }
+                val parameterIntent =
+                    Intent(this@MainActivity, ParameterActivity::class.java).apply {
+                        putExtra(PARAMETER_EXTRA, parameterTv.text)
+                    }
                 parameterArl.launch(parameterIntent)
                 // startActivityForResult(parameterIntent, PARAMETER_REQUEST_CODE) obsoleto, no vídeo foi retirado
             }
@@ -63,6 +65,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.openActivityMi -> {
+                val parameterIntent = Intent("OPEN_PARAMETER_ACTIVITY_ACTION").apply {
+                    putExtra(PARAMETER_EXTRA, activityMainBinding.parameterTv.text)
+                }
+                parameterArl.launch(parameterIntent)
                 true
             }
 
